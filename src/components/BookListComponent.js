@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from 'prop-types';
 
-export default props => {
-  let { list } = props;
+const bookListComponent = props => {
+  const { list } = props;
   return (
     <ol className="books-grid">
       {list.map(book => {
@@ -37,4 +38,10 @@ export default props => {
       })}
     </ol>
   );
-};
+}
+
+bookListComponent.propTypes = {
+  list: PropTypes.array.isRequired
+}
+
+export default bookListComponent;

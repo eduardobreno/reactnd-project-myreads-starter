@@ -12,7 +12,7 @@ export default class Home extends Component {
   };
   componentDidMount() {
     BooksAPI.getAll().then(res => {
-      let books = this.state.books;
+      const books = this.state.books;
       res.map(book => {
         return books[book.shelf].push(book);
       });
@@ -21,7 +21,7 @@ export default class Home extends Component {
   }
 
   render() {
-    let { currentlyReading, wantToRead, read } = this.state.books;
+    const { currentlyReading, wantToRead, read } = this.state.books;
 
     return (
       <div className="list-books">

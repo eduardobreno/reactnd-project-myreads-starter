@@ -14,7 +14,6 @@ class BooksApp extends React.Component {
   };
 
   render() {
-    let { books } = this.state;
     return (
       <div className="app">
         {this.state.showSearchPage ? (
@@ -42,7 +41,7 @@ class BooksApp extends React.Component {
             </div>
           </div>
         ) : (
-          <Home myReads={books} />
+          <Home />
         )}
       </div>
     );
