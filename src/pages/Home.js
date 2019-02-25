@@ -11,14 +11,60 @@ export default class Home extends Component {
       read: []
     }
   };
+
   componentDidMount() {
     BooksAPI.getAll().then(res => {
       const books = this.state.books;
-      res.map(book => {
-        return books[book.shelf].push(book);
+      res.forEach(book => {
+        books[book.shelf].push(book);
       });
       this.setState({ books });
     });
+  }
+
+  onMoveBook = (book, shelf) => {
+    BooksAPI.update(book, shelf).then(res => {
+      this.updateBookList(res);
+    });
+  }
+
+  updateBookList = (newBookList) => {
+    const currentlyReadingTmp = []
+    const wantToReadTmp = []
+    const readTmp = []
+
+    newBookList.currentlyReading.forEach(id => {
+      let book = this.findBookById(id);
+      if (book)
+        currentlyReadingTmp.push(book)
+    });
+    newBookList.wantToRead.forEach(id => {
+      let book = this.findBookById(id);
+      if (book)
+        wantToReadTmp.push(book)
+    });
+    newBookList.read.forEach(id => {
+      let book = this.findBookById(id);
+      if (book)
+        readTmp.push(book)
+    });
+
+    this.setState({
+      books: {
+        currentlyReading: currentlyReadingTmp,
+        wantToRead: wantToReadTmp,
+        read: readTmp
+      }
+    });
+
+  }
+
+  findBookById = (id) => {
+    const { currentlyReading, wantToRead, read } = this.state.books;
+    const books = currentlyReading.concat(wantToRead).concat(read);
+    //search in array if has id and return book object
+    let book = books.find(item => (item.id === id ? item : false));
+    return book;
   }
 
   render() {
@@ -34,19 +80,19 @@ export default class Home extends Component {
             <div className="bookshelf">
               <h2 className="bookshelf-title">Currently Reading</h2>
               <div className="bookshelf-books">
-                <BookList list={currentlyReading} />
+                <BookList list={currentlyReading} onMoveBook={this.onMoveBook} />
               </div>
             </div>
             <div className="bookshelf">
               <h2 className="bookshelf-title">Want to Read</h2>
               <div className="bookshelf-books">
-                <BookList list={wantToRead} />
+                <BookList list={wantToRead} onMoveBook={this.onMoveBook} />
               </div>
             </div>
             <div className="bookshelf">
               <h2 className="bookshelf-title">Read</h2>
               <div className="bookshelf-books">
-                <BookList list={read} />
+                <BookList list={read} onMoveBook={this.onMoveBook} />
               </div>
             </div>
           </div>

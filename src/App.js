@@ -15,8 +15,6 @@ class BooksApp extends React.Component {
       <div className="app">
         <Route exact path='/search' component={Search} />
         <Route exact path='/' render={() => (<Home myReads={books} />)} />
-
-
       </div>
     );
   }
