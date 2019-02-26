@@ -23,7 +23,6 @@ export default class Search extends Component {
             return;
         }
         BooksAPI.search(term).then(res => {
-            console.log(res)
             if (res.error) {
                 this.setState({ searchResult: [] })
             } else {

@@ -1,13 +1,27 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
+import * as Find from "../helpers/find";
 
 class BookListComponent extends Component {
+
+  getLocalCache() {
+    return JSON.parse(localStorage.getItem("myReads"));
+  }
+
+  getRightShelf(id) {
+    let book = Find.findBookById(id, this.getLocalCache())
+    if (book) {
+      return book.shelf;
+    } else {
+      return "none";
+    }
+  }
 
   onChange = (book, event) => {
     let el = event.nativeEvent.target;
     let index = el.selectedIndex
     let shelf = el[index].value;
-    this.props.onMoveBook(book, shelf)
+    this.props.onMoveBook(book, shelf);
   }
   render() {
     const { list } = this.props;
@@ -15,7 +29,7 @@ class BookListComponent extends Component {
       <ol className="books-grid">
         {list.length === 0 && "Nothing to show"}
         {list.map(book => {
-          let shelf = book.shelf || "none";
+          let shelf = book.shelf || this.getRightShelf(book.id);
           return (
             <li key={book.id}>
               <div className="book">

@@ -4,6 +4,7 @@ import "./App.css";
 import * as BooksAPI from "./BooksAPI";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
+import * as Find from "./helpers/find";
 
 class BooksApp extends React.Component {
 
@@ -43,21 +44,29 @@ class BooksApp extends React.Component {
     const currentlyReadingTmp = []
     const wantToReadTmp = []
     const readTmp = []
+    const { currentlyReading, wantToRead, read } = this.state.books;
+    const books = currentlyReading.concat(wantToRead).concat(read);
 
     newBookList.currentlyReading.forEach(id => {
-      let book = this.findBookById(id);
-      if (book)
-        currentlyReadingTmp.push(book)
+      let book = Find.findBookById(id, books);
+      if (book) {
+        book.shelf = "currentlyReading";
+        currentlyReadingTmp.push(book);
+      }
     });
     newBookList.wantToRead.forEach(id => {
-      let book = this.findBookById(id);
-      if (book)
-        wantToReadTmp.push(book)
+      let book = Find.findBookById(id, books);
+      if (book) {
+        book.shelf = "wantToRead";
+        wantToReadTmp.push(book);
+      }
     });
     newBookList.read.forEach(id => {
-      let book = this.findBookById(id);
-      if (book)
+      let book = Find.findBookById(id, books);
+      if (book) {
+        book.shelf = "read";
         readTmp.push(book)
+      }
     });
 
     this.setState({
@@ -70,14 +79,6 @@ class BooksApp extends React.Component {
     const listCache = currentlyReadingTmp.concat(wantToReadTmp).concat(readTmp);
     this.saveListCache(listCache);
 
-  }
-
-  findBookById = (id) => {
-    const { currentlyReading, wantToRead, read } = this.state.books;
-    const books = currentlyReading.concat(wantToRead).concat(read);
-    //search in array if has id and return book object
-    let book = books.find(item => (item.id === id ? item : false));
-    return book;
   }
 
   render() {
