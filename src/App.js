@@ -1,20 +1,91 @@
 import React from "react";
 import { Route } from 'react-router-dom'
 import "./App.css";
+import * as BooksAPI from "./BooksAPI";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 
 class BooksApp extends React.Component {
-  state = {
 
+  state = {
+    books: {
+      currentlyReading: [],
+      wantToRead: [],
+      read: []
+    }
   };
+
+  componentDidMount() {
+    BooksAPI.getAll().then(res => {
+      const books = this.state.books;
+      res.forEach(book => {
+        books[book.shelf].push(book);
+      });
+      this.setState({ books });
+      const { currentlyReading, wantToRead, read } = books;
+      const listCache = currentlyReading.concat(wantToRead).concat(read);
+      this.saveListCache(listCache);
+    });
+  }
+
+  onMoveBook = (book, shelf) => {
+    BooksAPI.update(book, shelf).then(res => {
+      this.updateBookList(res);
+    });
+  }
+
+  saveListCache = (list) => {
+    localStorage.setItem("myReads", JSON.stringify(list));
+  }
+
+
+  updateBookList = (newBookList) => {
+    const currentlyReadingTmp = []
+    const wantToReadTmp = []
+    const readTmp = []
+
+    newBookList.currentlyReading.forEach(id => {
+      let book = this.findBookById(id);
+      if (book)
+        currentlyReadingTmp.push(book)
+    });
+    newBookList.wantToRead.forEach(id => {
+      let book = this.findBookById(id);
+      if (book)
+        wantToReadTmp.push(book)
+    });
+    newBookList.read.forEach(id => {
+      let book = this.findBookById(id);
+      if (book)
+        readTmp.push(book)
+    });
+
+    this.setState({
+      books: {
+        currentlyReading: currentlyReadingTmp,
+        wantToRead: wantToReadTmp,
+        read: readTmp
+      }
+    });
+    const listCache = currentlyReadingTmp.concat(wantToReadTmp).concat(readTmp);
+    this.saveListCache(listCache);
+
+  }
+
+  findBookById = (id) => {
+    const { currentlyReading, wantToRead, read } = this.state.books;
+    const books = currentlyReading.concat(wantToRead).concat(read);
+    //search in array if has id and return book object
+    let book = books.find(item => (item.id === id ? item : false));
+    return book;
+  }
 
   render() {
     let { books } = this.state;
     return (
       <div className="app">
-        <Route exact path='/search' component={Search} />
-        <Route exact path='/' render={() => (<Home myReads={books} />)} />
+        <Route exact path='/search' component={() => (<Search onMoveBook={this.onMoveBook} />)} />
+        <Route exact path='/' render={() => (<Home myReads={books} onMoveBook={this.onMoveBook} />)} />
       </div>
     );
   }

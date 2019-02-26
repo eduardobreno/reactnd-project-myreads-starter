@@ -15,6 +15,7 @@ class BookListComponent extends Component {
       <ol className="books-grid">
         {list.length === 0 && "Nothing to show"}
         {list.map(book => {
+          let shelf = book.shelf || "none";
           return (
             <li key={book.id}>
               <div className="book">
@@ -29,7 +30,7 @@ class BookListComponent extends Component {
                   />
                   <div className="book-shelf-changer">
                     <select onChange={(event) => (this.onChange(book, event))}
-                      value={book.shelf}>
+                      value={shelf}>
                       <option value="move" disabled>
                         Move to...
                       </option>
@@ -41,7 +42,7 @@ class BookListComponent extends Component {
                   </div>
                 </div>
                 <div className="book-title">{book.title}</div>
-                <div className="book-authors">{book.authors[0]}</div>
+                {book.authors && <div className="book-authors">{book.authors[0]}</div>}
               </div>
             </li>
           );
